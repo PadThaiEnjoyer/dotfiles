@@ -1,0 +1,233 @@
+// -*- mode: jsonc -*-
+{
+    // "layer": "top", // Waybar at top layer
+    // "exclusive": false,
+    // "position": "bottom", // Waybar position (top|bottom|left|right)
+    "height": 32, // Waybar height (to be removed for auto height)
+    "margin-top": 0,
+    "width": 1200, // Waybar width
+    "spacing": 0, // Gaps between modules (4px)
+    // Choose the order of the modules
+    "modules-left": [
+	"custom/tardis",         
+	"mpris"
+    ],
+    "modules-center": [
+
+	"hyprland/workspaces"
+    ],
+    "modules-right": [
+        "custom/vpn",
+	"pulseaudio",
+        "network",
+        "power-profiles-daemon",
+        "custom/weather",
+        "backlight",
+        "battery",
+        "clock",
+        "tray"
+    ],
+    // Modules configuration
+    "hyprland/workspaces": {
+        "disable-scroll": true,
+        "all-outputs": true,
+        "warp-on-scroll": false,
+        "format": " {icon}",
+        "format-icons": {
+	    "1": "b", //"",      // Terminal / Command Window
+            "2": "c", //"",      // Terminal / Command Window
+            "3": "g", //" ",      // Browser (Firefox/General)
+            "4": "q", //" ",      // Spotify
+            "5": "v", 
+	    "6": "z", 
+            "7": "g", 
+	    "8": "b", 
+	    "9": "v", 
+	    "10": "z", 
+            "urgent": "v", // 󱈸󱈸
+            // "active": "",
+            "default": "b" //"󰒓"//󰇙󱚣󱓼󰒓
+         }
+     },
+    "keyboard-state": {
+        "numlock": true,
+        "capslock": true,
+        "format": "{name} {icon}",
+        "format-icons": {
+            "locked": "",
+            "unlocked": ""
+        }
+    },
+    "sway/mode": {
+        "format": "<span style=\"italic\">{}</span>"
+    },
+    "sway/scratchpad": {
+        "format": "{icon} {count}",
+        "show-empty": false,
+        "format-icons": ["", ""],
+        "tooltip": true,
+        "tooltip-format": "{app}: {title}"
+    },
+    "mpd": {
+        "format": "{stateIcon} {consumeIcon}{randomIcon}{repeatIcon}{singleIcon}{artist} - {album} - {title} ({elapsedTime:%M:%S}/{totalTime:%M:%S}) ⸨{songPosition}|{queueLength}⸩ {volume}% ",
+        "format-disconnected": "Disconnected ",
+        "format-stopped": "{consumeIcon}{randomIcon}{repeatIcon}{singleIcon}Stopped ",
+        "unknown-tag": "N/A",
+        "interval": 5,
+        "consume-icons": {
+            "on": " "
+        },
+        "random-icons": {
+            "off": "<span color=\"#f53c3c\"></span> ",
+            "on": " "
+        },
+        "repeat-icons": {
+            "on": " "
+        },
+        "single-icons": {
+            "on": "1 "
+        },
+        "state-icons": {
+            "paused": "",
+            "playing": ""
+        },
+        "tooltip-format": "MPD (connected)",
+        "tooltip-format-disconnected": "MPD (disconnected)"
+    },
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": "",
+            "deactivated": ""
+        }
+    },
+    "tray": {
+        // "icon-size": 21,
+        "spacing": 0,
+        // "icons": {
+        //   "blueman": "bluetooth",
+        //   "TelegramDesktop": "$HOME/.local/share/icons/hicolor/16x16/apps/telegram.png"
+        // }
+    },
+    "clock": {
+        // "timezone": "America/New_York",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+        "format-alt": "{:%Y-%m-%d}"
+    },
+    "cpu": {
+        "format": "{usage}% ",
+        "tooltip": false
+    },
+    "memory": {
+        "format": "{}% "
+    },
+    "custom/weather": {
+        "exec": "curl -s 'wttr.in?format=%t+%c' | tr -d '\\n'",
+        "interval": 3600,
+        "format": "󰖐 ",
+        "on-click": "hyprctl dispatch workspace 9 && kweather",
+        "tooltip": false
+    },
+    "backlight": {
+        // "device": "acpi_video1",
+        "format": "{percent}% {icon}",
+        "format-icons": ["", "", "", "", "", "", "", "", ""]
+    },
+    "battery": {
+        "states": {
+            // "good": 95,
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{capacity}% {icon}",
+        "format-full": "{capacity}% {icon}",
+        "format-charging": "{capacity}% ",
+        "format-plugged": "{capacity}% ",
+        "format-alt": "{time} {icon}",
+        // "format-good": "", // An empty format will hide the module
+        // "format-full": "",
+        "format-icons": ["", "", "", "", ""]
+    },
+    "battery#bat2": {
+        "bat": "BAT2"
+    },
+    "power-profiles-daemon": {
+      "format": "{icon}",
+      "tooltip-format": "Power profile: {profile}\nDriver: {driver}",
+      "tooltip": true,
+      "format-icons": {
+        "default": "",
+        "performance": "",
+        "balanced": " ",
+        "power-saver": ""
+      }
+    },
+    "network": {
+	"interface": "wlan0",
+        "format-wifi": "{signalStrength}% ",
+        "format-ethernet": "󰈀",
+        "format-disconnected": "⚠ Disconnected",
+        "on-click": "nm-connection-editor --class waybar-popup"
+    },
+    "pulseaudio": {
+        // "scroll-step": 1, // %, can be a float
+        "format": "{volume}% {icon}",
+        "format-bluetooth": "{volume}% {icon} {format_source}",
+        "format-bluetooth-muted": " {icon} {format_source}",
+        "format-muted": "{volume}% 󰝟",
+        "format-source": "", //
+        "format-source-muted": "",
+        "format-icons": {
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["", "", ""]
+        },
+        "on-click": "blueman-manager --class waybar-popup"
+    },
+    "custom/vpn": {
+        "interval": 3,
+        "exec": "ip link show proton0 >/dev/null 2>&1 || ip link show tun0 >/dev/null 2>&1 && echo '󰌾' || echo '󰿆'",
+        "on-click": "~/.config/waybar/scripts/vpn-toggle.sh",
+        "on-click-right": "protonvpn-app", // Right-click opens the full GUI
+        "tooltip-format": "VPN-Activate Shields"
+    },
+
+    "custom/tardis": {
+        "format": "󱓟", 
+        "on-click": "~/.config/hypr/switch_tardis.sh",
+        "tooltip-format": "Change Chameleon Circuit"
+    },
+
+    "mpris": {
+        "format": "{player_icon} {title} - {artist}",
+        "format-paused": "<i>{status_icon} {title} - {artist}</i>",
+        "player-icons": {
+            "default": "▶",
+            "spotify": "",
+            "firefox": ""
+        },
+        "status-icons": {
+            "paused": "⏸"
+        },
+        "max-length": 40,
+        "interval": 1,
+        "on-scroll-up": "lock=/tmp/waybar-mpris.lock; if [ ! -f $lock ]; then touch $lock; playerctl next; sleep 0.5; rm $lock; fi",
+        "on-scroll-down": "lock=/tmp/waybar-mpris.lock; if [ ! -f $lock ]; then touch $lock; playerctl previous; sleep 0.5; rm $lock; fi",
+        "on-click": "playerctl play-pause"},
+    "custom/power": {
+        "format" : "⏻ ",
+		"tooltip": false,
+		"menu": "on-click",
+		"menu-file": "$HOME/.config/waybar/power_menu.xml", // Menu file in resources folder
+		"menu-actions": {
+			"shutdown": "shutdown",
+			"reboot": "reboot",
+			"suspend": "systemctl suspend",
+			"hibernate": "systemctl hibernate"
+		}
+    }
+}
