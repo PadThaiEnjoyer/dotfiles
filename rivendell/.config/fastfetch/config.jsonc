@@ -1,0 +1,96 @@
+{
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+    "logo": {
+	    "source": "~/.config/fastfetch/chi-ro.txt",
+		"padding": {
+			"top": 2,
+		},
+    },
+    "display": {
+        "separator": ""
+    },
+    "modules": [
+        "break",
+        "break",
+        "break",
+
+        {
+            "type": "title",
+            "keyWidth": 10,
+			"format": "╔═══════════ஓ๑{}@{}๑ஓ═══════════╗",
+        },
+
+        {
+            "type": "os",
+            "key": " ",
+			"format": "║OS   | {} {}",
+        },
+        {
+            "type": "kernel",
+            "key": " ",
+			"format": "║KERN | {} {}",
+        },
+        {
+            "type": "packages",
+            "key": " ",
+			"format": "║PKGC | {}",
+        },
+
+        {
+            "type": "custom",
+            "format": "╠═══════════════════════════════════════╣",
+        },
+
+
+        {
+            "type": "shell",
+            "key": " ",
+			"format": "║SH   | {}",
+        },
+        {
+            "type": "terminal",
+            "key": " ",
+			"format": "║TERM | {}",
+        },
+        {
+            "type": "wm",
+            "key": " ",
+			"format": "║WM   | {}",
+        },
+        {
+            "type": "uptime",
+            "key": " ",
+			"format": "║UPT  | {2}h {3}m",
+        },
+
+		{
+			"type": "cpu",
+            "key": " ",
+			"format": "║CPU  | {}",
+		},
+		{
+			"type": "gpu",
+            "key": " ",
+			"format": "║GPU  | {} {}",
+		},
+		{
+			"type": "memory",
+            "key": " ",
+			"format": "║MEM  | {} {}",
+		},
+		{
+			"type": "display",
+            "key": " ",
+			"format": "║MNTR | {}x{} {}Hz {6} {7}",
+		},
+
+        {
+            "type": "custom",
+            "format": "╘════════════════ஓ๑@๑ஓ══════════════════╛",
+        },
+
+        "break",
+        "break",
+        "break",
+    ]
+}

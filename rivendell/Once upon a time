@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Plugins
+#hyprctl plugin load ~/code/ipc-closewindowv2/build/ipc-closewindowv2.so
+~/.config/hypr/ipclistener.zsh &
+#hyprctl plugin load ~/code/imgborders/build/imgborders.so
+hyprctl notify 0 5000 0 "[susplugin] all your bank details are belong to us"
+
+# Music
+#mpc clear
+#mpc add Dirt\ Poor\ Robins\ -\ Firebird\ \(Deluxe\ Edition\)\ -\ 08\ Beauty\ Will\ Save\ the\ World.mp3
+#mpc add Dirt\ Poor\ Robins\ -\ Firebird\ \(Deluxe\ Edition\)\ -\ 02\ Mad\ godS.mp3
+#mpc volume 70
+#mpc play
+#mpc seek 00:02:11
+
+clear
+fastfetch
