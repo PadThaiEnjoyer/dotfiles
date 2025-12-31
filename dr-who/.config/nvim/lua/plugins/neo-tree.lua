@@ -14,6 +14,15 @@ return {
         follow_current_file = {
           enabled = true, -- This makes the tree jump to the file you are editing
         },
+        enable_git_status = true,
+        event_handlers = {
+          {
+            event = "neo_tree_window_after_open",
+            handler = function()
+                require("neo-tree.sources.manager").refresh("filesystem")
+            end
+            },
+        },
         -- This allows the tree to change its root as you move around
         use_libuv_file_watcher = true, 
         -- Pressing 'H' in the tree will toggle hidden files (like .dotfiles)
