@@ -11,4 +11,5 @@ stow -D "$CURRENT"
 # Apply the new rice links
 stow "$NEXT"
 
-hyprctl dispatch exit
+sudo systemctl restart sddm
+#hyprctl dispatch exit
