@@ -7,7 +7,6 @@ return {
       "nvim-tree/nvim-web-devicons", -- requires a nerd font
       "MunifTanjim/nui.nvim",
     },
-
     opts = {
       close_if_last_window = true, -- This is the magic line
       filesystem = {
@@ -40,7 +39,8 @@ return {
 
       require("neo-tree").setup(opts)  
       -- This sets up the keybind to toggle the tree
-      vim.keymap.set('n', '<C-n>', ':Neotree filesystem reveal left<CR>', {})
+      vim.keymap.set('n', '<C-n>', ':Neotree filesystem toggle left<CR>', { desc = 'Open Files Sidebar'})
+      
     end
   }
 }

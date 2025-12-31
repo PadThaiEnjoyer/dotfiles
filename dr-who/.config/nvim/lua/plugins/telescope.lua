@@ -18,7 +18,7 @@ return {
       vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = 'Telescope live grep' })
       vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Telescope buffers' })
       vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = 'Telescope help tags' })
-      vim.keymap.set('n', '<leader>gs', require('telescope.builtin').git_status, {})
+      vim.keymap.set('n', '<leader>gs', require('telescope.builtin').git_status, { desc = 'Check git status'})
     end
   }
 }
