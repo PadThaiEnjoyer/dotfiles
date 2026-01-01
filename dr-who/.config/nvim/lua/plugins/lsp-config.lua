@@ -37,15 +37,21 @@ return {
 				capabilities = capabilities,
 				settings = {
 					Lua = {
-						diagnostics = { globals = { "vim" } },
+						runtime = {
+							version = "LuaJIT", -- Neovim uses LuaJIT
+						},
+						diagnostics = {
+							globals = { "vim" },
+						},
 						workspace = {
+							-- This tells the server where the Neovim runtime files are
 							library = vim.api.nvim_get_runtime_file("", true),
 							checkThirdParty = false,
 						},
+						telemetry = { enable = false },
 					},
 				},
 			})
-
 			-- The new way to enable servers in Neovim 0.11+
 			vim.lsp.config("pyright", { capabilities = capabilities })
 			vim.lsp.config("bashls", { capabilities = capabilities })
