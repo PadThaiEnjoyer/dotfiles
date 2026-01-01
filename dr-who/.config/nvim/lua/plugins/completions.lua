@@ -32,6 +32,7 @@ return {
 					["<C-e>"] = cmp.mapping.abort(),
 					-- Corrected: Use <Tab> instead of <TAB>
 					["<Tab>"] = cmp.mapping.confirm({ select = true }),
+					["<CR>"] = cmp.mapping.confirm({ select = true }),
 				}),
 				sources = cmp.config.sources({
 					{ name = "nvim_lsp" },

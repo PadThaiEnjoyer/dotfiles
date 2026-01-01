@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 return {
 	{
 		"williamboman/mason.nvim",
@@ -46,6 +47,8 @@ return {
 			})
 
 			-- The new way to enable servers in Neovim 0.11+
+			vim.lsp.config("pyright", { capabilities = capabilities })
+			vim.lsp.config("bashls", { capabilities = capabilities })
 			vim.lsp.enable("lua_ls")
 			vim.lsp.enable("bashls")
 			vim.lsp.enable("pyright")
