@@ -11,6 +11,33 @@ return {
 				bash = { "shfmt" },
 				rust = { "rustfmt" },
 			},
+			formatters = {
+				stylua = {
+					-- Tell Stylua to use the current buffer's indentation
+					args = {
+						"--indent-type",
+						"Spaces",
+						"--indent-width",
+						function()
+							return tostring(vim.bo.shiftwidth)
+						end,
+						"-",
+					},
+				},
+				ruff_format = {
+					-- Ruff is similar; we force it to look at Neovim's detected width
+					args = {
+						"format",
+						"--stdin-filename",
+						"$FILENAME",
+						"--indent-width",
+						function()
+							return tostring(vim.bo.shiftwidth)
+						end,
+						"-",
+					},
+				},
+			},
 			format_on_save = {
 				lsp_fallback = true, -- Use LSP formatting if conform doesn't have a tool
 				async = false,
