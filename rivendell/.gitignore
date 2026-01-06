@@ -1,8 +1,0 @@
-/*
-/*/
-!.gitignore
-!/.config/hypr/
-!/.config/quickshell/
-!/.config/kitty/
-!/.config/fastfetch/
-!/.config/nvim/
