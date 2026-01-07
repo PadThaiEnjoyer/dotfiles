@@ -21,7 +21,7 @@ PanelWindow {
         id: bg
         anchors.fill: parent
         fillMode: Image.PreserveAspectCrop
-        source: `/home/tudor/assets/${Globals.isDarkTheme ? "darkbg" : "bg"}.png`
+        source: `/home/tudor/assets/Wallpapers/tardis-ints/tardis-int${Globals.tardisIndex}.png`
         smooth: false
     }
     MultiEffect {
@@ -32,28 +32,4 @@ PanelWindow {
         blur: 1.0
     }
 
-    Text {
-        id: timetxt
-        x: 900
-        y: 150
-        font.family: "BigBlueTermPlusNerdFont"
-        font.pointSize: 100
-        font.bold: true
-        color: Globals.isDarkTheme ? "#9292B6" : "#3B2640"
-
-        Process {
-            id: dateProc
-            command: ["date", "+%H %M"]
-            running: true
-            stdout: SplitParser {
-                onRead: data => timetxt.text = data
-            }
-        }
-        Timer {
-            interval: 1000
-            running: true
-            repeat: true
-            onTriggered: dateProc.running = true
-        }
-    }
 }

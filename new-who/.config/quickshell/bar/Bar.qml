@@ -91,6 +91,8 @@ PanelWindow {
 
                 spacing: 12
 
+                TardisButton {}
+
                 Launcher {}
 
                 Workspaces {

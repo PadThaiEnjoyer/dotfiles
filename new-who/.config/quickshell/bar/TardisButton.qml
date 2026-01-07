@@ -3,22 +3,23 @@ import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 import QtQuick.Layouts
-import "../launcher" as Launcher
+import "../"
 
 MouseArea {
     id: root
 
-    implicitWidth: 26
-    implicitHeight: 26
+    implicitWidth: 23
+    implicitHeight: 40
 
     acceptedButtons: Qt.LeftButton
 
     Image {
         id: img
         anchors.fill: parent
-        source: "/home/tudor/assets/search.png"
+        source: "/home/tudor/assets/tardis.png"
         smooth: false
-        scale: Launcher.Controller.isOpen ? 0.8 : 1
+        scale: root.containsMouse ? 0.8 : 1
+
         Behavior on scale {
             NumberAnimation {
                 duration: 70
@@ -33,7 +34,6 @@ MouseArea {
         blurEnabled: true
     }
 
-    onPressed: () => {
-        Launcher.Controller.isOpen = !Launcher.Controller.isOpen;
-    }
+    onPressed: Globals.nextTardis()
 }
+

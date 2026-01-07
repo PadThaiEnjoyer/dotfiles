@@ -32,6 +32,16 @@ Singleton {
         gtk3ThemeProc.command = ["gsettings", "set", "org.gnome.desktop.interface", "gtk-theme", `"Adwaita${root.isDarkTheme ? "-dark" : ""}"`];
         gtk3ThemeProc.running = true;
     }
+    // --- TARDIS Interior Logic (New) ---
+    property int tardisIndex: 1
+    
+    function nextTardis() {
+        if (tardisIndex < 9) {
+            tardisIndex++;
+        } else {
+            tardisIndex = 1;
+        }
+    }
     
     function sh(cmd) {
         let p = Qt.createQmlObject('import Quickshell.Io; Process {}', root);

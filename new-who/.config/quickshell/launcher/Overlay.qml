@@ -21,9 +21,13 @@ PanelWindow {
         bottom: true
     }
     color: "transparent"
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
     WlrLayershell.namespace: "shell:launcher"
-
+    MouseArea {
+        anchors.fill: parent
+        onClicked: root.controller.isOpen = false
+    }
+    
     Rectangle {
         id: main
 
