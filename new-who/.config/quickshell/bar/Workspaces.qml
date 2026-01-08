@@ -110,11 +110,11 @@ MouseArea {
                         colorization: 1.0
                         
                         // Default color is White, Active color is Gold (#FFD700)
-                        colorizationColor: wsItem.active ? "#FFD700" : "#FFFFFF"
+                        colorizationColor: wsItem.active ? "#FFD700" : "#2471b5"
                         
                         // Active Glow
                         blurEnabled: wsItem.active
-                        blur: 0.4
+                        blur: 0.3
                         brightness: wsItem.active ? 0.6 : 0.0
 
                         Behavior on brightness { NumberAnimation { duration: 200 } }
