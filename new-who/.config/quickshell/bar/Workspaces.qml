@@ -10,7 +10,7 @@ MouseArea {
 
     required property var bar
     property int wsBaseIndex: 1
-    property int wsCount: 7
+    property int wsCount: 10
     readonly property HyprlandMonitor monitor: Hyprland.monitorFor(bar.screen)
     property int currentIndex: 0
     property int existsCount: 0
@@ -34,9 +34,8 @@ MouseArea {
 
     RowLayout {
         id: row
-
         anchors.fill: parent
-        spacing: 8
+        spacing: 12
 
         Repeater {
             model: root.wsCount
@@ -50,11 +49,31 @@ MouseArea {
                 property bool exists: workspace != null
                 property bool active: (root.monitor?.activeWorkspace ?? false) && root.monitor.activeWorkspace == workspace
 
-                implicitWidth: 26
-                implicitHeight: 26
+                // VISIBILITY: Only show up to the highest workspace currently in use
+                property bool shouldShow: {
+                    let maxActive = 1;
+                    const workspaces = Hyprland.workspaces.values;
+                    for (let i = 0; i < workspaces.length; i++) {
+                        if (workspaces[i].id > maxActive) {
+                            maxActive = workspaces[i].id;
+                        }
+                    }
+                    // Always show at least the first workspace, otherwise up to the max active one
+                    return wsIndex <= maxActive;
+                }
+                
+                visible: shouldShow
+                implicitWidth: 32
+                implicitHeight: 32
+
+                // HOVER EFFECT: Shrinks to 0.8 size when mouse enters
+                hoverEnabled: true
+                scale: containsMouse ? 0.8 : 1.0
+                Behavior on scale { 
+                    NumberAnimation { duration: 150; easing.type: Easing.OutCubic } 
+                }
 
                 acceptedButtons: Qt.LeftButton
-
                 onPressed: Hyprland.dispatch(`workspace ${wsIndex}`)
 
                 onExistsChanged: {
@@ -62,13 +81,11 @@ MouseArea {
                 }
 
                 onActiveChanged: {
-                    if (active)
-                        root.currentIndex = wsIndex;
+                    if (active) root.currentIndex = wsIndex;
                 }
 
                 Connections {
                     target: root
-
                     function onWorkspaceAdded(workspace: HyprlandWorkspace) {
                         if (workspace.id == wsItem.wsIndex) {
                             wsItem.workspace = workspace;
@@ -76,30 +93,32 @@ MouseArea {
                     }
                 }
 
-                Rectangle {
-                    id: fill
-                    anchors.fill: parent
-                    anchors.margins: 2
-                    radius: width / 2
-                    color: wsItem.exists ? "#C0DB4C" : "#59622D"
-                }
+                // THE IMAGE & COLORING SECTION
                 Image {
+                    id: galSymbol
                     anchors.fill: parent
-                    smooth: false
-                    source: "/home/tudor/assets/workspace.png"
-                }
-                MultiEffect {
-                    source: fill
-                    anchors.fill: fill
-                    blur: 1.0
-                    brightness: 0.3
-                    blurEnabled: true
-                    visible: wsItem.active
-                    opacity: wsItem.active ? 1.0 : 0
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: 100
-                        }
+                    smooth: true
+                    asynchronous: true
+                    source: `file:///home/tudor/assets/workspace_images/gal_${wsIndex}.png`
+                    
+                    // Greyed out (0.3 opacity) if workspace is empty
+                    opacity: wsItem.exists ? 1.0 : 0.3
+                    Behavior on opacity { NumberAnimation { duration: 200 } }
+
+                    layer.enabled: true
+                    layer.effect: MultiEffect {
+                        colorization: 1.0
+                        
+                        // Default color is White, Active color is Gold (#FFD700)
+                        colorizationColor: wsItem.active ? "#FFD700" : "#FFFFFF"
+                        
+                        // Active Glow
+                        blurEnabled: wsItem.active
+                        blur: 0.4
+                        brightness: wsItem.active ? 0.6 : 0.0
+
+                        Behavior on brightness { NumberAnimation { duration: 200 } }
+                        Behavior on colorizationColor { ColorAnimation { duration: 200 } }
                     }
                 }
             }
@@ -108,7 +127,6 @@ MouseArea {
 
     Connections {
         target: Hyprland.workspaces
-
         function onObjectInsertedPost(workspace) {
             root.workspaceAdded(workspace);
         }

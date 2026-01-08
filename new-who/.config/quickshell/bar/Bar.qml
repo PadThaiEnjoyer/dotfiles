@@ -31,7 +31,7 @@ PanelWindow {
         right: true
     }
     exclusiveZone: 48
-    implicitHeight: 72
+    implicitHeight: 84
     color: "transparent"
     mask: barRegion
 
@@ -58,50 +58,51 @@ PanelWindow {
                 bottom: parent.bottom
                 left: parent.left
             }
-
+            layer.enabled: true
+            layer.effect: MultiEffect {
+                blurEnabled: true
+                blur: 0.4    // Softens the background seen through the bar
+            }
             implicitWidth: left.width + left.anchors.leftMargin + left.anchors.rightMargin
             implicitHeight: left.height
-            color: "#3B253F"
+            color: "#dd202020"
+            border.color: "#ee101010"
+            border.width: 4
 
-            Rectangle {
-                z: -1
-                anchors.fill: parent
-                color: "#BE850E"
-                anchors.margins: -4
+        }
+
+
+        Image {
+            width: 16 * 6
+            height: 4 * 9
+            anchors.top: parent.bottom
+            anchors.left: parent.left
+            source: "/home/tudor/assets/wire2.png"
+            smooth: false
+        }
+        RowLayout {
+            id: left
+
+            anchors {
+                top: parent.top
+                bottom: parent.bottom
+                left: parent.left
+                leftMargin: 7
+                rightMargin: 7
             }
-            Image {
-                width: 16 * 6
-                height: 4 * 6
-                anchors.top: parent.bottom
-                anchors.left: parent.left
-                source: "/home/tudor/assets/bar-decor.png"
-                smooth: false
+
+            spacing: 12
+
+            TardisButton {}
+
+            Launcher {}
+
+            Workspaces {
+                bar: root
             }
 
-            RowLayout {
-                id: left
-
-                anchors {
-                    top: parent.top
-                    bottom: parent.bottom
-                    left: parent.left
-                    leftMargin: 7
-                    rightMargin: 7
-                }
-
-                spacing: 12
-
-                TardisButton {}
-
-                Launcher {}
-
-                Workspaces {
-                    bar: root
-                }
-
-                SysTray.SysTray {
-                    bar: root
-                }
+            SysTray.SysTray {
+                bar: root
             }
         }
 
@@ -111,62 +112,65 @@ PanelWindow {
                 bottom: parent.bottom
                 right: parent.right
             }
+            layer.enabled: true
+            layer.effect: MultiEffect {
+                blurEnabled: true
+                blur: 0.4    // Softens the background seen through the bar
+            }
 
             implicitWidth: right.width + right.anchors.leftMargin + right.anchors.rightMargin
             implicitHeight: right.height
-            color: "#3B253F"
+            color: "#aa202020"
+            border.color: "#101010"
+            border.width: 4
 
-            Rectangle {
-                z: -1
-                anchors.fill: parent
-                color: "#BE850E"
-                anchors.margins: -4
+
+        }
+
+        Image {
+            width: 16 * 6
+            height: 4 * 9
+            anchors.top: parent.bottom
+            anchors.right: parent.right
+            source: "/home/tudor/assets/wire2.png"
+            smooth: false
+            mirror: true
+        }
+        RowLayout {
+            id: right
+
+            anchors {
+                top: parent.top
+                bottom: parent.bottom
+                right: parent.right
+                leftMargin: 7
+                rightMargin: 7
             }
-            Image {
-                width: 16 * 6
-                height: 4 * 6
-                anchors.top: parent.bottom
-                anchors.right: parent.right
-                source: "/home/tudor/assets/bar-decor.png"
-                smooth: false
-                mirror: true
+
+            spacing: 12
+
+            Time {}
+
+            Volume {
+                bar: root
             }
 
-            RowLayout {
-                id: right
+            Mpris.Players {
+                window: root
+                bar: root
+            }
 
-                anchors {
-                    top: parent.top
-                    bottom: parent.bottom
-                    right: parent.right
-                    leftMargin: 7
-                    rightMargin: 7
-                }
+            Theme {}
+            
+            Item { width: 0.1}
+            
+            BatteryText {}
 
-                spacing: 12
-
-                Time {}
-
-                Volume {
-                    bar: root
-                }
-
-                Mpris.Players {
-                    window: root
-                    bar: root
-                }
-
-                Theme {}
-		
-		Item { width: 0.1}
-		
-		BatteryText {}
-
-                Power {
-                    id: power
-                    bar: root
-                }
+            Power {
+                id: power
+                bar: root
             }
         }
+
     }
 }
