@@ -9,6 +9,7 @@ import Quickshell.Widgets
 import Quickshell.Wayland
 import Quickshell.Hyprland
 import Quickshell.Services.Mpris
+import QtQuick.Effects
 import "../.."
 import "../../components"
 import ".."
@@ -17,7 +18,6 @@ PopupWindow {
     id: root
 
     property bool isOpen: false
-
     implicitWidth: 700
     //implicitHeight: popupContent.implicitHeight + popupContent.anchors.margins * 2
     implicitHeight: 800
@@ -53,26 +53,61 @@ PopupWindow {
         segmentLen: 22
         start: Qt.vector2d(250, -5)
         end: Qt.vector2d(wrapper.x + 49, wrapper.y)
+        color: "#FF0000"
     }
     Rope {
         segmentCount: 4
         segmentLen: 22
         start: Qt.vector2d(wrapper.width + 200 - 50, -5)
         end: Qt.vector2d(wrapper.width + wrapper.x - 49, wrapper.y)
+        color: "#00aa00"
     }
 
     Rectangle {
         id: wrapper
         implicitWidth: 500
         implicitHeight: popupContent.implicitHeight + popupContent.anchors.margins * 2
-        color: "#824524"
+        color: "transparent"
+
 
         x: 200
         y: -wrapper.height
         readonly property var targetX: 200
         readonly property var targetY: root.isOpen ? 70 : -wrapper.height - 50
-        property var velocityX: 0
+        property var velocityX: 0        
         property var velocityY: 0
+
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.RightButton // Listen for right-clicks
+            
+            onClicked: (mouse) => {
+                if (mouse.button === Qt.RightButton) {
+                    root.isOpen = false; // Close the popup
+                    root.focusable = false;
+                }
+            }
+        }
+        Item {
+                anchors.fill: parent
+                
+                // This is the magic part for background blur
+                // It captures what's behind the window
+                layer.enabled: true
+                layer.effect: MultiEffect {
+                    blurEnabled: true
+                    blur: 1.0 // High blur for that "frosted" look
+                    brightness: -0.1 // Darken it slightly for the "screen" feel
+                }
+                
+                // Use a semi-transparent dark rectangle to tint the blur
+                Rectangle {
+                    anchors.fill: parent
+                    color: "#aa1A1A1A" // Dark charcoal with 80% opacity
+                    border.color: "#00ffff" // Cyan border
+                    border.width: 4
+                }
+            }
 
         FrameAnimation {
             running: true
@@ -115,14 +150,7 @@ PopupWindow {
             anchors.margins: 8
             clip: true
 
-            Image {
-                scale: 10
-                anchors.fill: parent
-                source: "/home/tudor/assets/wood.png"
-                smooth: false
-                fillMode: Image.Tile
-                opacity: 0.4
-            }
+
         }
 
         ColumnLayout {
@@ -149,7 +177,7 @@ PopupWindow {
                     anchors.centerIn: parent
                     implicitWidth: 50
                     implicitHeight: 50
-                    color: "#824524"
+                    color: "#00000000"
                 }
 
                 RowLayout {
@@ -380,6 +408,16 @@ PopupWindow {
                             }
                             MprisController.setLoopState(target);
                         }
+
+                        layer.enabled: true
+                        layer.effect: MultiEffect {
+                            blurEnabled: true
+                            blur: 0.3
+                            brightness: 0.5 // This creates the "glow"
+                            colorization: 0.3
+                            colorizationColor: "#00ffff"
+                        }
+
                     }
 
                     ClickableIcon {
@@ -391,6 +429,15 @@ PopupWindow {
                         image: "/home/tudor/assets/fastforward.png"
                         mirror: true
                         onClicked: MprisController.previous()
+                        layer.enabled: true
+                        layer.effect: MultiEffect {
+                            blurEnabled: true
+                            blur: 0.3
+                            brightness: 0.5 // This creates the "glow"
+                            colorization: 0.3
+                            colorizationColor: "#00ffff"
+                        }
+
                     }
 
                     ClickableIcon {
@@ -398,7 +445,16 @@ PopupWindow {
                         implicitHeight: 42
                         enabled: MprisController.canTogglePlaying
                         image: `/home/tudor/assets/${MprisController.isPlaying ? "pause" : "play"}.png`
-                        onClicked: MprisController.togglePlaying()
+                        onClicked: MprisController.togglePlaying()                       
+                        layer.enabled: true
+                        layer.effect: MultiEffect {
+                            blurEnabled: true
+                            blur: 0.3
+                            brightness: 0.5 // This creates the "glow"
+                            colorization: 0.3
+                            colorizationColor: "#00ffff"
+                        }
+
                     }
 
                     ClickableIcon {
@@ -409,6 +465,16 @@ PopupWindow {
                         enabled: MprisController.canGoNext
                         image: "/home/tudor/assets/fastforward.png"
                         onClicked: MprisController.next()
+
+                        layer.enabled: true
+                        layer.effect: MultiEffect {
+                            blurEnabled: true
+                            blur: 0.3
+                            brightness: 0.5 // This creates the "glow"
+                            colorization: 0.3
+                            colorizationColor: "#00ffff"
+                        }
+
                     }
 
                     ClickableIcon {
@@ -419,6 +485,14 @@ PopupWindow {
                         enabled: MprisController.shuffleSupported
                         image: `/home/tudor/assets/${MprisController.hasShuffle ? "shuffle" : "noshuffle"}.png`
                         onClicked: MprisController.setShuffle(!MprisController.hasShuffle)
+                        layer.enabled: true
+                        layer.effect: MultiEffect {
+                            blurEnabled: true
+                            blur: 0.3
+                            brightness: 0.5 // This creates the "glow"
+                            colorization: 0.3
+                            colorizationColor: "#00ffff"
+                        }
                     }
                 }
             }
@@ -459,7 +533,7 @@ PopupWindow {
                         implicitHeight: 24
                         width: slider.availableWidth
                         height: implicitHeight
-                        color: "#824524"
+                        color: "#22ffffff"
 
                         Rectangle {
                             anchors.margins: 8
@@ -467,7 +541,7 @@ PopupWindow {
                             y: anchors.topMargin
                             width: slider.visualPosition * (parent.width - anchors.leftMargin - anchors.rightMargin)
                             height: parent.height - anchors.topMargin - anchors.bottomMargin
-                            color: "#8D804B"
+                            color: "#00ffff"
                         }
                     }
 
@@ -476,8 +550,18 @@ PopupWindow {
                         y: slider.topPadding + slider.availableHeight / 2 - height / 2
                         implicitWidth: 16
                         implicitHeight: 16
-                        rotation: 45
-                        color: "#8D804B"
+                        radius: 8
+                        rotation: 0
+                        color: "#00ffff"
+                        layer.enabled: true
+                        layer.effect: MultiEffect {
+                            blurEnabled: true
+                            blur: 0.5
+                            brightness: slider.pressed ? 0.8 : 0.5
+                            Behavior on brightness {
+                                NumberAnimation { duration: 100 }
+                            }
+                        }
                     }
 
                     Connections {
@@ -511,7 +595,7 @@ PopupWindow {
         }
     }
     Image {
-        source: "/home/tudor/assets/rope-tie.png"
+        source: "/home/tudor/assets/wire-tie-red.png"
         smooth: false
         width: 32
         height: 32
@@ -519,7 +603,7 @@ PopupWindow {
         y: wrapper.y - height / 2
     }
     Image {
-        source: "/home/tudor/assets/rope-tie.png"
+        source: "/home/tudor/assets/wire-tie-green.png"
         smooth: false
         width: 32
         height: 32

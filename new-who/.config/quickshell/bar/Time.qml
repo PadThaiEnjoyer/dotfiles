@@ -1,15 +1,25 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell.Io
+import QtQuick.Effects
 import ".."
 
 Text {
     id: timetxt
-    font.family: "BigBlueTermPlusNerdFont"
-    font.pointSize: 16
+    font.family: "Orbitron"
+    font.weight: Font.Bold
+    font.pointSize: 18
     font.bold: true
-    color: "white"
-    opacity: 0.5
+    color: "#FFFFFF" 
+    opacity: 0.8
+    layer.enabled: true
+    layer.effect: MultiEffect {
+        blurEnabled: true
+        blur: 0.0
+        brightness: 0.5 // This creates the "glow"
+        colorization: 0.3
+        colorizationColor: "#FF991C"
+    }
 
     Process {
         id: dateProc

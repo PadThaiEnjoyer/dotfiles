@@ -6,6 +6,7 @@ import QtQuick.Controls
 import Quickshell
 import Quickshell.Services.Pipewire
 import Quickshell.Widgets
+import QtQuick.Effects
 import "mpris"
 
 MouseArea {
@@ -61,7 +62,7 @@ MouseArea {
             anchor.window: root.bar
             width: 200
             height: 32
-            color: "#9B5B36"
+            color: "#aa1A1A1A"
             Connections {
                 target: root
                 function onXChanged() {
@@ -87,8 +88,10 @@ MouseArea {
                 from: 0
                 to: 1
 
+                onMoved: {
+                    root.node.audio.volume = slider.value;
+                }
                 value: root.node.audio.volume
-                onValueChanged: root.node.audio.volume = value
 
                 background: Rectangle {
                     x: slider.leftPadding
@@ -96,7 +99,7 @@ MouseArea {
                     implicitHeight: 16
                     width: slider.availableWidth
                     height: implicitHeight
-                    color: "#824524"
+                    color: "#22ffffff"
                     opacity: node.audio.muted ? 0.5 : 1
 
                     Rectangle {
@@ -105,7 +108,7 @@ MouseArea {
                         y: anchors.topMargin
                         width: slider.visualPosition * (parent.width - anchors.leftMargin - anchors.rightMargin)
                         height: parent.height - anchors.topMargin - anchors.bottomMargin
-                        color: "#8D804B"
+                        color: "#00ffff"
                     }
                 }
 
@@ -114,8 +117,19 @@ MouseArea {
                     y: slider.topPadding + slider.availableHeight / 2 - height / 2
                     implicitWidth: 12
                     implicitHeight: 12
-                    rotation: 45
-                    color: "#8D804B"
+                    radius: 8
+                    rotation: 0
+                    color: "#00ffff"
+                    layer.enabled: true
+                    layer.effect: MultiEffect {
+                        blurEnabled: true
+                        blur: 0.5
+                        brightness: slider.pressed ? 0.8 : 0.4 
+                        Behavior on brightness {
+                            NumberAnimation { duration: 100 }
+                        }
+                    }
+
                 }
             }
 

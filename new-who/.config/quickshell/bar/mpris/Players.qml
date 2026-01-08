@@ -9,6 +9,7 @@ import Quickshell.Widgets
 import Quickshell.Wayland
 import Quickshell.Hyprland
 import Quickshell.Services.Mpris
+import QtQuick.Effects
 import "../.."
 import ".."
 
@@ -63,6 +64,14 @@ MouseArea {
                         duration: 70
                     }
                 }
+                layer.enabled: true
+                layer.effect: MultiEffect {
+                    blurEnabled: true
+                    blur: 0.3
+                    brightness: 0.5 // This creates the "glow"
+                    colorization: 0.3
+                    colorizationColor: "#00ffff"
+                }
             }
 
             ClickableIcon {
@@ -75,6 +84,14 @@ MouseArea {
                 hoverEnabled: true
                 enabled: MprisController.canTogglePlaying
                 onClicked: MprisController.togglePlaying()
+                layer.enabled: true
+                layer.effect: MultiEffect {
+                    blurEnabled: true
+                    blur: 0.3
+                    brightness: 0.5 // This creates the "glow"
+                    colorization: 0.3
+                    colorizationColor: "#00ffff"
+                }
             }
 
             ClickableIcon {
@@ -90,6 +107,14 @@ MouseArea {
                     NumberAnimation {
                         duration: 70
                     }
+                }
+                layer.enabled: true
+                layer.effect: MultiEffect {
+                    blurEnabled: true
+                    blur: 0.3
+                    brightness: 0.5 // This creates the "glow"
+                    colorization: 0.3
+                    colorizationColor: "#00ffff"
                 }
             }
         }
