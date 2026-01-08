@@ -68,7 +68,7 @@ MouseArea {
 
                 // HOVER EFFECT: Shrinks to 0.8 size when mouse enters
                 hoverEnabled: true
-                scale: containsMouse ? 0.8 : 1.0
+                scale: containsMouse ? 0.9 : 1.0
                 Behavior on scale { 
                     NumberAnimation { duration: 150; easing.type: Easing.OutCubic } 
                 }
