@@ -117,7 +117,7 @@ MouseArea {
                         blur: 0.3
                         brightness: wsItem.active ? 0.6 : 0.0
 
-                        Behavior on brightness { NumberAnimation { duration: 200 } }
+                        Behavior on brightness { NumberAnimation { duration: 150 } }
                         Behavior on colorizationColor { ColorAnimation { duration: 200 } }
                     }
                 }
