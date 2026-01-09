@@ -31,7 +31,26 @@ MouseArea {
 
     Image {
         anchors.fill: parent
-        source: `/home/tudor/assets/${root.node.audio.muted ? "noaudio" : "audio"}.png`
+        source: {
+            const base = root.node.audio.muted ? "noaudio" : "audio";
+            
+            // Safety check: ensure properties exist before searching
+            const props = root.node.properties || {};
+            
+            // Check 1: Does the node name start with 'bluez' (Standard for Bluetooth)
+            const isBluez = (root.node.name || "").startsWith("bluez");
+            
+            // Check 2: Does it have a Bluetooth MAC address property?
+            const hasBtAddress = !!props["api.bluez5.address"];
+            
+            // Check 3: Fallback to icon name search
+            const iconName = props["device.icon-name"] || "";
+            const isBtIcon = iconName.includes("bluetooth");
+
+            const isBluetooth = isBluez || hasBtAddress || isBtIcon;
+            
+            return `/home/tudor/assets/${base}${isBluetooth ? "-bluetooth" : ""}.png`;
+        }
         smooth: false
 
         scale: popupLoader.active ? 0.9 : 1
@@ -60,8 +79,8 @@ MouseArea {
 
             visible: true
             anchor.window: root.bar
-            width: 200
-            height: 32
+            implicitWidth: 200
+            implicitHeight: 32
             color: "#aa1A1A1A"
             Connections {
                 target: root
