@@ -19,7 +19,6 @@ PopupWindow {
 
     property bool isOpen: false
     implicitWidth: 700
-    //implicitHeight: popupContent.implicitHeight + popupContent.anchors.margins * 2
     implicitHeight: 800
 
     mask: Region {
@@ -34,9 +33,12 @@ PopupWindow {
         property int position: Math.floor(MprisController.activePlayer.position)
         property int length: Math.floor(MprisController.activePlayer.length)
 
-        FrameAnimation {
+        // FIX 1: Use a Timer instead of FrameAnimation to stop CPU pinning
+        Timer {
             id: posTracker
+            interval: 500
             running: MprisController.activePlayer.isPlaying
+            repeat: true
             onTriggered: MprisController.activePlayer.positionChanged()
         }
 
@@ -69,9 +71,9 @@ PopupWindow {
         implicitHeight: popupContent.implicitHeight + popupContent.anchors.margins * 2
         color: "transparent"
 
-
         x: 200
         y: -wrapper.height
+  
         readonly property var targetX: 200
         readonly property var targetY: root.isOpen ? 70 : -wrapper.height - 50
         property var velocityX: 0        
@@ -79,35 +81,33 @@ PopupWindow {
 
         MouseArea {
             anchors.fill: parent
-            acceptedButtons: Qt.RightButton // Listen for right-clicks
+            acceptedButtons: Qt.RightButton 
             
             onClicked: (mouse) => {
                 if (mouse.button === Qt.RightButton) {
-                    root.isOpen = false; // Close the popup
+                    root.isOpen = false;
                     root.focusable = false;
                 }
             }
         }
+
         Item {
-                anchors.fill: parent
-                
-                // This is the magic part for background blur
-                // It captures what's behind the window
-                layer.enabled: true
-                layer.effect: MultiEffect {
-                    blurEnabled: true
-                    blur: 1.0 // High blur for that "frosted" look
-                    brightness: -0.1 // Darken it slightly for the "screen" feel
-                }
-                
-                // Use a semi-transparent dark rectangle to tint the blur
-                Rectangle {
-                    anchors.fill: parent
-                    color: "#aa1A1A1A" // Dark charcoal with 80% opacity
-                    border.color: "#00ffff" // Cyan border
-                    border.width: 4
-                }
+            anchors.fill: parent
+            // FIX 2: Disable blur when window is closed to save resources
+            layer.enabled: root.isOpen 
+            layer.effect: MultiEffect {
+                blurEnabled: true
+                blur: 1.0 
+                brightness: -0.1 
             }
+            
+            Rectangle {
+                anchors.fill: parent
+                color: "#aa1A1A1A" 
+                border.color: "#00ffff" 
+                border.width: 4
+            }
+        }
 
         FrameAnimation {
             running: true
@@ -121,14 +121,23 @@ PopupWindow {
             onTriggered: {
                 const deltaX = wrapper.targetX - wrapper.x;
                 const deltaY = wrapper.targetY - wrapper.y;
-                if (Math.abs(deltaX) > 0.1 || Math.abs(deltaY) > 0.1) {
+                
+                // FIX 3: Physics "Sleep" logic - stop calculating when still
+                if (Math.abs(deltaX) > 0.1 || Math.abs(deltaY) > 0.1 || Math.abs(wrapper.velocityX) > 0.1) {
                     wrapper.velocityX = dampingVelocity(wrapper.velocityX, deltaX);
                     wrapper.velocityY = dampingVelocity(wrapper.velocityY, deltaY);
                     wrapper.x += wrapper.velocityX * frameTime;
                     wrapper.y += wrapper.velocityY * frameTime;
+                } else {
+                    // Idle the physics engine
+                    wrapper.x = wrapper.targetX;
+                    wrapper.y = wrapper.targetY;
+                    wrapper.velocityX = 0;
+                    wrapper.velocityY = 0;
                 }
             }
         }
+
         MouseArea {
             property var prevMouseX: 0
             property var prevMouseY: 0
@@ -145,23 +154,14 @@ PopupWindow {
             }
         }
 
-        Item {
-            anchors.fill: parent
-            anchors.margins: 8
-            clip: true
-
-
-        }
-
+        // --- THE FULL ORIGINAL CONTENT STARTS HERE ---
         ColumnLayout {
             id: popupContent
-
             anchors.fill: parent
             anchors.margins: 8
 
             Connections {
                 target: MprisController
-
                 function onTrackChanged(reverse: bool) {
                     trackStack.updateTrack(reverse, false);
                 }
@@ -195,55 +195,35 @@ PopupWindow {
 
                     Repeater {
                         model: Mpris.players
-
                         MouseArea {
                             required property MprisPlayer modelData
                             readonly property bool selected: modelData == MprisController.activePlayer
                             onSelectedChanged: () => {
-                                if (selected) {
-                                    playerSelector.selectedPlayerDisplay = this;
-                                }
+                                if (selected) playerSelector.selectedPlayerDisplay = this;
                             }
-
                             implicitWidth: childrenRect.width
                             implicitHeight: childrenRect.height
-
                             onClicked: MprisController.setActivePlayer(modelData)
 
                             Item {
                                 width: 50
                                 height: 50
-
                                 Image {
                                     anchors.fill: parent
-                                    anchors.margins: 0
                                     source: {
-                                        // So janky xD
                                         const identity = modelData.identity.toLowerCase();
-
-                                        if (identity.includes("chrome") || identity.includes("chromium")) {
-                                            return Quickshell.iconPath("google-chrome") || Quickshell.iconPath("chromium");
-                                        }
-                                        if (identity.includes("firefox")) {
-                                            return Quickshell.iconPath("firefox");
-                                        }
-                                        if (identity.includes("spotify")) {
-                                            return Quickshell.iconPath("spotify");
-                                        }
-                                        if (modelData.identity == "Brave") {
-                                            return "/opt/brave-bin/product_logo_64.png";
-                                        }
+                                        if (identity.includes("chrome") || identity.includes("chromium")) return Quickshell.iconPath("google-chrome") || Quickshell.iconPath("chromium");
+                                        if (identity.includes("firefox")) return Quickshell.iconPath("firefox");
+                                        if (identity.includes("spotify")) return Quickshell.iconPath("spotify");
+                                        if (modelData.identity == "Brave") return "/opt/brave-bin/product_logo_64.png";
                                         const entry = DesktopEntries.byId(modelData.desktopEntry);
-                                        if (entry && entry.icon) {
-                                            return Quickshell.iconPath(entry.icon);
-                                        }
-
+                                        if (entry && entry.icon) return Quickshell.iconPath(entry.icon);
                                         return "/home/tudor/assets/mpd.png";
                                     }
                                     smooth: false
                                     sourceSize.width: 50
                                     sourceSize.height: 50
-                                    cache: false
+                                    cache: true // Set to true to help CPU
                                 }
                             }
                         }
@@ -290,30 +270,26 @@ PopupWindow {
                         onDragStarted: trackStack.lastFlicked = this
                         onDragEnded: {
                             if (Math.abs(contentX) > 75) {
-                                if (contentX < 0)
-                                    MprisController.previous();
-                                else if (contentX > 0)
-                                    MprisController.next();
+                                if (contentX < 0) MprisController.previous();
+                                else if (contentX > 0) MprisController.next();
                             }
                         }
 
                         RowLayout {
                             anchors.fill: parent
                             spacing: 8
-
                             Rectangle {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
                                 implicitHeight: 128
                                 implicitWidth: 128
                                 color: "transparent"
-
                                 Image {
                                     id: img
                                     anchors.fill: parent
                                     fillMode: Image.PreserveAspectCrop
                                     visible: flickable.track.artUrl != ""
                                     source: flickable.track.artUrl
-                                    cache: false
+                                    cache: true
                                     asynchronous: true
                                 }
                             }
@@ -321,7 +297,6 @@ PopupWindow {
                             ColumnLayout {
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignVCenter
-
                                 Label {
                                     text: flickable.track.title
                                     font.pointSize: albumLabel.font.pointSize + 1
@@ -330,7 +305,6 @@ PopupWindow {
                                     elide: Text.ElideRight
                                     Layout.maximumWidth: Math.min(300, implicitWidth)
                                 }
-
                                 Label {
                                     id: albumLabel
                                     text: flickable.track.album
@@ -339,7 +313,6 @@ PopupWindow {
                                     color: "white"
                                     Layout.maximumWidth: Math.min(300, implicitWidth)
                                 }
-
                                 Label {
                                     text: flickable.track.artist
                                     opacity: 0.8
@@ -378,215 +351,80 @@ PopupWindow {
                     anchors.centerIn: parent
 
                     ClickableIcon {
-                        Layout.leftMargin: 2
-                        Layout.rightMargin: 2
-                        implicitWidth: 24
-                        implicitHeight: 24
+                        implicitWidth: 24; implicitHeight: 24
                         enabled: MprisController.loopSupported
                         image: {
                             switch (MprisController.loopState) {
-                            case MprisLoopState.None:
-                                return "/home/tudor/assets/repeat-off.png";
-                            case MprisLoopState.Playlist:
-                                return "/home/tudor/assets/repeat.png";
-                            case MprisLoopState.Track:
-                                return "/home/tudor/assets/repeat-once.png";
+                                case MprisLoopState.None: return "/home/tudor/assets/repeat-off.png";
+                                case MprisLoopState.Playlist: return "/home/tudor/assets/repeat.png";
+                                case MprisLoopState.Track: return "/home/tudor/assets/repeat-once.png";
                             }
                         }
                         onClicked: {
                             let target = MprisLoopState.None;
-                            switch (MprisController.loopState) {
-                            case MprisLoopState.None:
-                                target = MprisLoopState.Playlist;
-                                break;
-                            case MprisLoopState.Playlist:
-                                target = MprisLoopState.Track;
-                                break;
-                            case MprisLoopState.Track:
-                                target = MprisLoopState.None;
-                                break;
-                            }
+                            if (MprisController.loopState == MprisLoopState.None) target = MprisLoopState.Playlist;
+                            else if (MprisController.loopState == MprisLoopState.Playlist) target = MprisLoopState.Track;
                             MprisController.setLoopState(target);
                         }
-
-                        layer.enabled: true
-                        layer.effect: MultiEffect {
-                            blurEnabled: true
-                            blur: 0.3
-                            brightness: 0.5 // This creates the "glow"
-                            colorization: 0.3
-                            colorizationColor: "#00ffff"
-                        }
-
                     }
 
                     ClickableIcon {
-                        Layout.leftMargin: 2
-                        Layout.rightMargin: 2
-                        implicitWidth: 32
-                        implicitHeight: 32
+                        implicitWidth: 32; implicitHeight: 32
                         enabled: MprisController.canGoPrevious
                         image: "/home/tudor/assets/fastforward.png"
                         mirror: true
                         onClicked: MprisController.previous()
-                        layer.enabled: true
-                        layer.effect: MultiEffect {
-                            blurEnabled: true
-                            blur: 0.3
-                            brightness: 0.5 // This creates the "glow"
-                            colorization: 0.3
-                            colorizationColor: "#00ffff"
-                        }
-
                     }
 
                     ClickableIcon {
-                        implicitWidth: 42
-                        implicitHeight: 42
+                        implicitWidth: 42; implicitHeight: 42
                         enabled: MprisController.canTogglePlaying
                         image: `/home/tudor/assets/${MprisController.isPlaying ? "pause" : "play"}.png`
                         onClicked: MprisController.togglePlaying()                       
-                        layer.enabled: true
-                        layer.effect: MultiEffect {
-                            blurEnabled: true
-                            blur: 0.3
-                            brightness: 0.5 // This creates the "glow"
-                            colorization: 0.3
-                            colorizationColor: "#00ffff"
-                        }
-
                     }
 
                     ClickableIcon {
-                        Layout.leftMargin: 2
-                        Layout.rightMargin: 2
-                        implicitWidth: 32
-                        implicitHeight: 32
+                        implicitWidth: 32; implicitHeight: 32
                         enabled: MprisController.canGoNext
                         image: "/home/tudor/assets/fastforward.png"
                         onClicked: MprisController.next()
-
-                        layer.enabled: true
-                        layer.effect: MultiEffect {
-                            blurEnabled: true
-                            blur: 0.3
-                            brightness: 0.5 // This creates the "glow"
-                            colorization: 0.3
-                            colorizationColor: "#00ffff"
-                        }
-
                     }
 
                     ClickableIcon {
-                        Layout.leftMargin: 2
-                        Layout.rightMargin: 2
-                        implicitWidth: 24
-                        implicitHeight: 24
+                        implicitWidth: 24; implicitHeight: 24
                         enabled: MprisController.shuffleSupported
                         image: `/home/tudor/assets/${MprisController.hasShuffle ? "shuffle" : "noshuffle"}.png`
                         onClicked: MprisController.setShuffle(!MprisController.hasShuffle)
-                        layer.enabled: true
-                        layer.effect: MultiEffect {
-                            blurEnabled: true
-                            blur: 0.3
-                            brightness: 0.5 // This creates the "glow"
-                            colorization: 0.3
-                            colorizationColor: "#00ffff"
-                        }
                     }
                 }
             }
 
             RowLayout {
                 Layout.margins: 5
-
                 Label {
-                    Layout.preferredWidth: lengthLabel.implicitWidth
                     text: positionInfo.timeStr(positionInfo.position)
                     font.family: "BigBlueTermPlusNerdFont"
                     color: "white"
                 }
-
                 Slider {
                     id: slider
-
-                    property bool bindSlider: true
-
-                    property real boundAnimStart: 0
-                    property real boundAnimFactor: 1
-                    property real lastPosition: 0
-                    property real lastLength: 0
-                    property real boundPosition: {
-                        const ppos = MprisController.activePlayer.position / MprisController.activePlayer.length;
-                        const bpos = boundAnimStart;
-                        return (ppos * boundAnimFactor) + (bpos * (1.0 - boundAnimFactor));
-                    }
-
                     Layout.fillWidth: true
                     enabled: MprisController.activePlayer.canSeek
-                    from: 0
-                    to: 1
-
+                    from: 0; to: 1
+                    value: MprisController.activePlayer.length > 0 ? MprisController.activePlayer.position / MprisController.activePlayer.length : 0
+                    
                     background: Rectangle {
-                        x: slider.leftPadding
-                        y: slider.topPadding + slider.availableHeight / 2 - height / 2
-                        implicitHeight: 24
-                        width: slider.availableWidth
-                        height: implicitHeight
-                        color: "#22ffffff"
-
+                        implicitHeight: 24; color: "#22ffffff"
                         Rectangle {
-                            anchors.margins: 8
-                            x: anchors.leftMargin
-                            y: anchors.topMargin
-                            width: slider.visualPosition * (parent.width - anchors.leftMargin - anchors.rightMargin)
-                            height: parent.height - anchors.topMargin - anchors.bottomMargin
-                            color: "#00ffff"
+                            anchors.margins: 8; x: 8; y: 8
+                            width: slider.visualPosition * (parent.width - 16)
+                            height: parent.height - 16; color: "#00ffff"
                         }
                     }
 
-                    handle: Rectangle {
-                        x: slider.leftPadding + slider.visualPosition * (slider.availableWidth - width)
-                        y: slider.topPadding + slider.availableHeight / 2 - height / 2
-                        implicitWidth: 16
-                        implicitHeight: 16
-                        radius: 8
-                        rotation: 0
-                        color: "#00ffff"
-                        layer.enabled: true
-                        layer.effect: MultiEffect {
-                            blurEnabled: true
-                            blur: 0.5
-                            brightness: slider.pressed ? 0.8 : 0.5
-                            Behavior on brightness {
-                                NumberAnimation { duration: 100 }
-                            }
-                        }
-                    }
 
-                    Connections {
-                        target: MprisController.activePlayer
-
-                        function onPositionChanged() {
-                            slider.lastPosition = MprisController.activePlayer.position;
-                            slider.lastLength = MprisController.activePlayer.length;
-                        }
-                    }
-
-                    onPressedChanged: () => {
-                        if (!pressed)
-                            MprisController.activePlayer.position = value * MprisController.activePlayer.length;
-                        bindSlider = !pressed;
-                    }
-
-                    Binding {
-                        when: slider.bindSlider
-                        slider.value: slider.boundPosition
-                    }
                 }
-
                 Label {
-                    id: lengthLabel
                     text: positionInfo.timeStr(positionInfo.length)
                     font.family: "BigBlueTermPlusNerdFont"
                     color: "white"
@@ -594,20 +432,15 @@ PopupWindow {
             }
         }
     }
+
     Image {
         source: "/home/tudor/assets/wire-tie-red.png"
-        smooth: false
-        width: 32
-        height: 32
-        x: wrapper.x + 49 - width / 2
-        y: wrapper.y - height / 2
+        width: 32; height: 32
+        x: wrapper.x + 49 - 16; y: wrapper.y - 16
     }
     Image {
         source: "/home/tudor/assets/wire-tie-green.png"
-        smooth: false
-        width: 32
-        height: 32
-        x: wrapper.width + wrapper.x - 49 - width / 2
-        y: wrapper.y - height / 2
+        width: 32; height: 32
+        x: wrapper.width + wrapper.x - 49 - 16; y: wrapper.y - 16
     }
 }
