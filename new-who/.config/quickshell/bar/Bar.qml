@@ -170,6 +170,7 @@ PanelWindow {
                 id: power
                 bar: root
             }
+            DropDownMenu {}
         }
 
     }
