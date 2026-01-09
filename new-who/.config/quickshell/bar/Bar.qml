@@ -151,6 +151,8 @@ PanelWindow {
 
             Time {}
 
+            Wifi {}
+
             Volume {
                 bar: root
             }
